@@ -1,24 +1,45 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import LoginForm from "./page/login/Login";
+import RegistrationForm from "./page/registration/Registration";
+import Dashboard from "./page/dashboard/Dashboard";
 
 function App() {
+  const [authenticated, setAuthenticated] = useState(false);
+  const [user, setUser] = useState<string | null>(null);
+
+  const handleLogin = (username: string) => {
+    setAuthenticated(true);
+    setUser(username);
+  };
+
+  const handleRegistration = () => {
+    setAuthenticated(true);
+    setUser(null);
+    return <Navigate to="/dashboard" />;
+  };
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <BrowserRouter>
+        <Routes>
+          <Route
+            path="/"
+            element={
+              authenticated ? (
+                <Navigate to="/dashboard" />
+              ) : (
+                <LoginForm onLogin={handleLogin} />
+              )
+            }
+          />
+          <Route
+            path="/register"
+            element={<RegistrationForm onRegistration={handleRegistration} />}
+          />
+          <Route path="/dashboard" element={<Dashboard user={user} />} />
+        </Routes>
+      </BrowserRouter>
     </div>
   );
 }
