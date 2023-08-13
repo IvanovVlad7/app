@@ -4,7 +4,7 @@ import { useForm, Controller, SubmitHandler, useFormState } from "react-hook-for
 import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
-// import axios from "axios"
+import axios from "axios"
 
 interface IRegistrationForm {
   username: string;
@@ -22,49 +22,49 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ onRegistration }) =
   const navigate = useNavigate();
 
   const onSubmit: SubmitHandler<IRegistrationForm> = async (data) => {
-  try {
-    const response = await fetch('http://localhost:3000/register', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
+    try {
+      const response = await fetch('http://localhost:3000/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
 
-    if (response.status === 201) {
-      onRegistration();
-      navigate("/dashboard");
-    } else {
-      console.error('Ошибка при выполнении POST-запроса');
+      if (response.status === 201) {
+        onRegistration();
+        navigate("/dashboard");
+      } else {
+        console.error('Ошибка при выполнении POST-запроса');
+      }
+    } catch (error) {
+      console.error('Ошибка при выполнении POST-запроса:', error);
     }
-  } catch (error) {
-    console.error('Ошибка при выполнении POST-запроса:', error);
-  }
-};
+  };
 
 
-  // const onTestClick = async () => {
-  //   try {
-  //     axios.post("http://localhost:3000/register").then((response) => {
-  //       console.log(response);
-  //     });
-  //     const response = await fetch('http://localhost:3000/register',);
+  const onTestClick = async () => {
+    try {
+      axios.post("http://localhost:3000/api/data").then((response) => {
+        console.log(response);
+      });
+      const response = await fetch('http://localhost:3000/api/data',);
 
-  //     if (response.ok) {
-  //       const responseData = await response.json();
-  //       console.log('Ответ от сервера:', responseData);
-  //     } else {
-  //       console.error('Ошибка при выполнении GET-запроса');
-  //     }
-  //   } catch (error) {
-  //     console.error('Ошибка при выполнении GET-запроса:', error);
-  //   }
-  // };
+      if (response.ok) {
+        const responseData = await response.json();
+        console.log('Ответ от сервера:', responseData);
+      } else {
+        console.error('Ошибка при выполнении GET-запроса');
+      }
+    } catch (error) {
+      console.error('Ошибка при выполнении GET-запроса:', error);
+    }
+  };
 
 
   return (
     <div className="auth-form">
-      {/* <button onClick={onTestClick}>TEST</button> */}
+      <button onClick={onTestClick}>TEST</button>
       <Typography variant="h3" component="div">
         Зарегистрируйтесь
       </Typography>
@@ -90,7 +90,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ onRegistration }) =
         <Controller
           control={control}
           name="email"
-          rules={{ required: "Обязательно заполнить" }} // Правило для email
+          rules={{ required: "Обязательно заполнить" }}
           render={({ field }) => (
             <TextField
               label="Email"
