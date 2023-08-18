@@ -1,27 +1,51 @@
-import React, { ChangeEvent } from "react";
+import { ChangeEvent } from "react";
 import { Link } from "react-router-dom";
 import { useForm, Controller, SubmitHandler, useFormState } from "react-hook-form";
 import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import './Login.css'
+import * as React from "react";
 
 interface ILoginForm {
-  login: string;
-  email: string; 
+  name: string;
+  email: string;
   password: string;
 }
 
 interface LoginFormProps {
-  onLogin: (username: string) => void;
+  onLogin: (prop: boolean, id: string) => void;
 }
 
-const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
+const LoginForm: React.FC<LoginFormProps> = ({ onLogin }: any) => {
   const { handleSubmit, control } = useForm<ILoginForm>();
   const { errors } = useFormState({ control });
 
-  const onSubmit: SubmitHandler<ILoginForm> = (data) => {
-    onLogin(data.login);
+  const onSubmit: SubmitHandler<ILoginForm> = async (data) => {
+    try {
+      const response = await fetch('http://localhost:3001/login', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+      const parsedResponse = await response.json();
+      
+      if (response.status === 200) {
+        console.log('success');
+        
+        onLogin(true, parsedResponse.payload.userId)
+      } else {
+        console.log('fail');
+        
+        const errorData = await response.json(); 
+        alert(errorData.message)
+        onLogin(false)
+      }
+    } catch (error) {
+      console.error('Ошибка при выполнении POST-запроса:', error);
+    }
   };
 
   return (
@@ -32,7 +56,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
       <form className="auth-form__form" onSubmit={handleSubmit(onSubmit)}>
         <Controller
           control={control}
-          name="login"
+          name="name"
           rules={{ required: "Обязательно заполнить" }}
           render={({ field }) => (
             <TextField
@@ -43,18 +67,18 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
               fullWidth={true}
               onChange={(e: ChangeEvent<HTMLInputElement>) => field.onChange(e)}
               value={field.value}
-              error={!!errors.login?.message}
-              helperText={errors.login?.message}
+              error={!!errors.name?.message}
+              helperText={errors.name?.message}
             />
           )}
         />
         <Controller
           control={control}
-          name="email" 
+          name="email"
           rules={{ required: "Обязательно заполнить" }}
           render={({ field }) => (
             <TextField
-              label="email" 
+              label="email"
               size="small"
               margin="normal"
               className="auth-form__input"

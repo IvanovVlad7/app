@@ -1,10 +1,10 @@
-import React, { ChangeEvent } from "react";
+import { ChangeEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm, Controller, SubmitHandler, useFormState } from "react-hook-form";
 import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
-import axios from "axios"
+import * as React from "react";
 
 interface IRegistrationForm {
   username: string;
@@ -13,7 +13,7 @@ interface IRegistrationForm {
 }
 
 interface RegistrationFormProps {
-  onRegistration: () => void;
+  onRegistration: (prop: boolean, id?: string) => void;
 }
 
 const RegistrationForm: React.FC<RegistrationFormProps> = ({ onRegistration }) => {
@@ -21,21 +21,25 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ onRegistration }) =
   const { errors } = useFormState({ control });
   const navigate = useNavigate();
 
+
   const onSubmit: SubmitHandler<IRegistrationForm> = async (data) => {
     try {
-      const response = await fetch('http://localhost:3000/register', {
+      const response = await fetch('http://localhost:3001/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(data),
       });
+      const parsedResponse = await response.json();
 
       if (response.status === 201) {
-        onRegistration();
+        onRegistration(true, parsedResponse.payload.userId);
         navigate("/dashboard");
       } else {
-        console.error('Ошибка при выполнении POST-запроса');
+        const errorData = await response.json(); 
+        alert(errorData.message)
+        onRegistration(false);
       }
     } catch (error) {
       console.error('Ошибка при выполнении POST-запроса:', error);
@@ -43,28 +47,8 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ onRegistration }) =
   };
 
 
-  const onTestClick = async () => {
-    try {
-      axios.post("http://localhost:3000/api/data").then((response) => {
-        console.log(response);
-      });
-      const response = await fetch('http://localhost:3000/api/data',);
-
-      if (response.ok) {
-        const responseData = await response.json();
-        console.log('Ответ от сервера:', responseData);
-      } else {
-        console.error('Ошибка при выполнении GET-запроса');
-      }
-    } catch (error) {
-      console.error('Ошибка при выполнении GET-запроса:', error);
-    }
-  };
-
-
   return (
     <div className="auth-form">
-      <button onClick={onTestClick}>TEST</button>
       <Typography variant="h3" component="div">
         Зарегистрируйтесь
       </Typography>

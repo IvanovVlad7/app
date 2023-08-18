@@ -1,23 +1,29 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import LoginForm from "./page/login/Login";
 import RegistrationForm from "./page/registration/Registration";
 import Dashboard from "./page/dashboard/Dashboard";
 
-function App() {
+const App = () => {
   const [authenticated, setAuthenticated] = useState(false);
-  const [user, setUser] = useState<string | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
-  const handleLogin = (username: string) => {
-    setAuthenticated(true);
-    setUser(username);
+  const handleLogin = (status: boolean, userId?: string) => {
+    setAuthenticated(status);
+    console.log('handlelogin', status, userId)
+    if (status && userId) {
+      console.log(userId);
+      
+      setCurrentUserId(userId)
+    } else {
+      setCurrentUserId(null);
+    }
   };
 
-  const handleRegistration = () => {
-    setAuthenticated(true);
-    setUser(null);
-    return <Navigate to="/dashboard" />;
-  };
+  useEffect(() => {
+    console.log('authenticated: ', authenticated);
+    
+  }, [authenticated])
 
   return (
     <div className="App">
@@ -35,13 +41,22 @@ function App() {
           />
           <Route
             path="/register"
-            element={<RegistrationForm onRegistration={handleRegistration} />}
+            element={<RegistrationForm onRegistration={handleLogin} />}
           />
-          <Route path="/dashboard" element={<Dashboard user={user} />} />
+          <Route
+            path="/dashboard"
+            element={
+              authenticated ? (
+                <Dashboard currentUserId={currentUserId} onLogout={handleLogin} />
+              ) : (
+                <Navigate to="/" />
+              )
+            }
+          />
         </Routes>
       </BrowserRouter>
     </div>
   );
-}
+};
 
 export default App;
